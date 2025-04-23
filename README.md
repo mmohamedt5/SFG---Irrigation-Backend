@@ -4,7 +4,7 @@ Baha
 Omar
 Mentor: Amar Elgali , Ayman Elmubrak , Mazin Mustafa, Khalid El Hassan
 ##
-Folder Structure:
+Folder Structure:  
 app/                             # Root folder for SFG Irrigation project  
 │  
 ├── __init__.py                  # App initialization or factory  
