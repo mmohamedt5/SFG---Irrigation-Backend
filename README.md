@@ -4,4 +4,6 @@ Baha
 Omar
 
 Mentor: Amar Elgali , Ayman Elmubrak 
-Main Function: Create a backend that can serve the website (front end) and integrate with the MCU
+Main Backend Function: Create a backend that can serve the website (front end) and integrate with the MCU
+
+Main Front end Function: Serve the client side of the web app
