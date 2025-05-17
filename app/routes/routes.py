@@ -17,23 +17,27 @@ def handle_command():
     global command_queue
     
     if request.method == 'PATCH':
-        data = request.get_json()
-        if not data or data.get("command") not in [1, 2]:
-            return jsonify({"error": "Invalid command"}), 400
+        try:
+            data = request.get_json()
+            if not data or data.get("command") not in [1, 2]:
+                return jsonify({"error": "Invalid command"}), 400
+            
+            command_queue = data["command"]
+            return jsonify({"message": f"Command {command_queue} queued", "command": command_queue})
         
-        command_queue = data["command"]
-        return jsonify({"message": f"Command {command_queue} queued"})
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
     
-    # New GET method to allow Arduino to retrieve queued commands
     elif request.method == 'GET':
         if command_queue is not None:
             response = jsonify({"command": command_queue})
-            # Reset the command after it's been retrieved
-            command_queue = None
+            command_queue = None  # Clear after sending
             return response
         else:
             return jsonify({"message": "No commands in queue"})
-
+    
+    # This handles any other HTTP methods accidentally sent
+    return jsonify({"error": "Method not allowed"}), 405
 
 @api_bp.route('/v0/device/status', methods=['GET', 'PATCH'])
 def handle_device_status():

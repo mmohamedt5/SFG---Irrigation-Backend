@@ -44,6 +44,20 @@
             color: #666;
             margin: 10px 0;
         }
+        .open-button {
+            background-color: #4CAF50; /* Green for open */
+            margin-right: 10px;
+        }
+
+        .close-button {
+                background-color: #f44336; /* Red for close */
+            }
+
+            /* Optional: disable buttons based on current state */
+        .button:disabled {
+                background-color: #cccccc;
+                cursor: not-allowed;
+            }
     </style>
 </head>
 <body>
@@ -61,14 +75,13 @@
         Last Updated: {{ last_updated or "Never" }}
     </div>
     
-    <button class="button" onclick="toggleValve()">Toggle Valve</button>
+    <button class="button open-button" onclick="openValve()">Open Valve</button>
+    <button class="button close-button" onclick="closeValve()">Close Valve</button>
     
     <script>
-        async function toggleValve() {
+        async function sendCommand(commandValue) {
+            console.log(commandValue);
             try {
-                const currentStatus = document.getElementById('status').textContent;
-                const commandValue = currentStatus === 'OPEN' ? 2 : 1;
-                
                 await fetch('/api/device/command', {
                     method: 'PATCH',
                     headers: {
@@ -76,11 +89,22 @@
                     },
                     body: JSON.stringify({ command: commandValue })
                 });
+                // Update the status immediately after sending command
+                //updateStatus();
             } catch (error) {
                 console.error('Error sending command:', error);
                 alert('Failed to send command. Please check connection.');
             }
         }
+    
+        function openValve() {
+            sendCommand(1);  // Command 1 for OPEN
+        }
+    
+        function closeValve() {
+            sendCommand(2);  // Command 2 for CLOSE
+        }
+
 
         async function updateStatus(data = null) {
             try {
