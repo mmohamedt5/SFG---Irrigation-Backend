@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Irrigation System Control</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0 auto;
+            padding: 20px;
+            max-width: 600px;
+        }
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .status {
+            font-weight: bold;
+            font-size: 24px;
+            margin: 20px 0;
+        }
+        .OPEN {
+            color: green;
+        }
+        .CLOSED {
+            color: red;
+        }
+        .temperature {
+            color: red;
+            font-size: 20px;
+        }
+        .last-updated {
+            font-style: italic;
+            color: #666;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Irrigation System Control</h1>
+    
+    <p>
+        Temperature: <span class="temperature" id="temperature">{{ temperature }}°C</span>
+    </p>
+    
+    <div class="status">
+        System Status: <span class="{{ status }}" id="status">{{ status }}</span>
+    </div>
+    
+    <div class="last-updated" id="last-updated">
+        Last Updated: {{ last_updated or "Never" }}
+    </div>
+    
+    <button class="button" onclick="toggleValve()">Toggle Valve</button>
+    
+    <script>
+        async function toggleValve() {
+            try {
+                const currentStatus = document.getElementById('status').textContent;
+                const commandValue = currentStatus === 'OPEN' ? 2 : 1;
+                
+                await fetch('/api/device/command', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ command: commandValue })
+                });
+            } catch (error) {
+                console.error('Error sending command:', error);
+                alert('Failed to send command. Please check connection.');
+            }
+        }
+
+        async function updateStatus(data = null) {
+            try {
+                if (!data) {
+                    const response = await fetch('/api/v0/device/status');
+                    data = await response.json();
+                }
+                
+                document.getElementById('status').textContent = data.status;
+                document.getElementById('status').className = data.status;
+                
+                if (data.temperature) {
+                    document.getElementById('temperature').textContent = `${data.temperature}°C`;
+                }
+                
+                if (data.updated_on) {
+                    const date = new Date(data.updated_on);
+                    document.getElementById('last-updated').textContent = 
+                        `Last Updated: ${date.toLocaleString()}`;
+                }
+            } catch (error) {
+                console.error('Error updating status:', error);
+            }
+        }
+
+        // Initial load
+        updateStatus();
+        // Update every 2 seconds
+        setInterval(updateStatus, 2000);
+    </script>
+</body>
+</html>

@@ -13,7 +13,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    from app.routes.routes import api_bp
-    app.register_blueprint(api_bp)
+    from app.routes.routes import api_bp as main_bp
+    app.register_blueprint(main_bp, url_prefix='/api')
 
     return app
